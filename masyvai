@@ -1,0 +1,158 @@
+// v01.vektoriai.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <fstream>
+#include <stdlib.h>
+#include <iomanip>
+#include <sstream>
+#include <cstdio>
+#include <iomanip>
+#include <ctime>
+#include <cctype>
+#include <cstring>
+
+using namespace std;
+
+struct studentas {
+	string vardas;
+	string pavarde;
+	vector<int> pazymiai;
+	float egzaminas;
+};
+
+//funkcijos reikalingos galutinio balo apskaiciavimui;
+
+float vidurkis(vector<int> pazymiai) {
+	int suma = 0;
+	int dydis = pazymiai.size();
+
+	for (int i = 0; i < dydis; i++) {
+		suma += pazymiai[i];
+	}
+	return suma / dydis;
+}
+
+float mediana(vector<int> pazymiai) {
+	sort(pazymiai.begin(), pazymiai.end());
+
+	if (pazymiai.size() % 2 == 0) {
+		return (pazymiai[pazymiai.size() / 2 - 1] + pazymiai[pazymiai.size() / 2]) / 2;
+	}
+	else {
+		return pazymiai[pazymiai.size() / 2];
+	}
+}
+
+float galutinis_balas(int egzaminas, float vidurkis) {
+	return 0.4 * vidurkis + 0.6 * egzaminas;
+}
+
+//duomenu spausdinimas
+
+void spausdinimas(vector<studentas> grupe) {
+	cout << "Iseitis" << endl;
+	cout << left << setw(30) << "Vardas" << setw(30) << "Pavarde" << setw(30) << "Galutinis balas (vidurkis)" << setw(35) << "Galutinis balas (mediana)" << endl;
+	cout << "----------------------------------------------------------------------------------------------------------------" << endl;
+	for (auto& g : grupe) {
+		cout << left << setw(30) << g.vardas << setw(30) << g.pavarde << setw(30) << fixed << setprecision(2) << galutinis_balas(g.egzaminas, vidurkis(g.pazymiai)) << setw(30);
+		cout << setw(30) << fixed << setprecision(2) << galutinis_balas(g.egzaminas, mediana(g.pazymiai)) << endl;
+		g.pazymiai.clear();
+	}
+	grupe.clear();
+}
+
+int main()
+{
+	int n = 0;
+	vector<studentas> grupe;
+	studentas laikinas;
+
+
+	cout << "Iveskite studentu, kuriu duomenis pildysite, skaiciu: ";
+	cin >> n;
+
+	grupe.reserve(n);
+
+	for (int i = 0; i < n; i++) {
+		cout << "Iveskite studento varda, pavarde: " << endl;
+		cin >> laikinas.vardas >> laikinas.pavarde;
+
+		cout << "Ar egzamino ivertinima sugeneruoti automatiskai? " << endl;
+		cout << "Iveskite 'Taip' arba 'Ne'" << endl;
+
+		string a;
+		cin >> a;
+
+
+		if (a == "Taip") {
+			srand(time(NULL));
+			int sugeneruotas = rand() % 10 + 1;
+			laikinas.egzaminas = sugeneruotas;
+
+			cout << "Sugeneruotas egzamino ivertinimas: " << sugeneruotas << endl;
+		}
+
+		cout << "Ar semestro namu darbu ivertinimus sugeneruoti automatiskai? " << endl;
+		cout << "Iveskite 'Taip' arba 'Ne'" << endl;
+
+		string b;
+		cin >> b;
+
+		if (b == "Taip") {
+			while (true) {
+				srand(time(0));
+				int sugeneruotas = rand() % 10 + 1;
+				laikinas.pazymiai.push_back(sugeneruotas);
+
+				cout << "Sugeneruotas ivertinimas: " << sugeneruotas << endl;
+
+				cout << "Ar norite sugeneruoti dar viena pazymi?" << endl;
+				cout << "Iveskite 'Taip' arba 'Ne'" << endl;
+
+				string c;
+				cin >> c;
+
+				if (c == "Ne") {
+					break;
+				}
+			}
+			grupe.push_back(laikinas);
+		}
+
+		if (b == "Ne") {
+			cout << "Iveskite studento egzamino ivertinimas: " << endl;
+			cin >> laikinas.egzaminas;
+
+			cout << "Iveskite studento semestro namu darbu pazymius." << endl;
+			cout << "Suvede visus pazymius, suveskite 'end' ir spauskite Enter" << endl;
+
+			string input;
+
+			laikinas.pazymiai.reserve(50);
+
+			while (input != "end") {
+
+				cin >> input;
+				if (input == "end") {
+					break;
+				}
+				laikinas.pazymiai.push_back(stoi(input));
+			}
+			grupe.push_back(laikinas);
+
+			cout << "Studentas: " << laikinas.vardas << " " << laikinas.pavarde << endl;
+			cout << "Egzamino ivertinimas: " << laikinas.egzaminas << endl;
+			cout << "Semestro namu darbu pazymiai: ";
+			for (auto& p : laikinas.pazymiai) {
+				cout << p << " ";
+			}
+			cout << endl;
+		}
+	}
+	spausdinimas(grupe);
+}
